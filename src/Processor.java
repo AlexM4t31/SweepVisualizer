@@ -29,6 +29,68 @@ public class Processor implements ActionListener {
 
     }
 
+    private ArrayList<Object> newPrepareFileReading(File file) {
+        ArrayList<Object> resArrList = new ArrayList<>();
+
+        // number of files is ONE. 1. UNO
+        // I'll worry about edge cases, ways to fuck this function up just a bit later
+
+        BufferedReader bReader = null;
+
+        try {
+            bReader = new BufferedReader(new FileReader(file));
+        } catch (IOException exc) {
+            System.out.println("The app was not able to open the provided file.");
+            return resArrList;
+        }
+
+        try {
+
+            // I think runs doesn't have any reason to be here at this time
+            // in the 'past' it was very useful bcs we were using multiple files, and it was the no of
+            // param combos per file
+            // now, we only have a need for an overall runs sort of deal
+            // yeah
+            // maybe for the sake of separation of versions, conceptually, it would be wise
+            // to use a new term i.e instances or something
+            // also we don't have any use for spacing anymore, too
+
+            // nice, so all of that gets deleted.
+
+            String namesLine = bReader.readLine().replaceAll("\"", "");
+            String[] splitNames = namesLine.split(",");
+            // id, paramnames, metricnames, imagename
+            // how many paramNames? hardcoded
+
+            int paramNumber = 2;
+            int metricNumber = 2;
+
+            ArrayList<String> varNames = MyUtilities.subListFromArray(splitNames, 1, 1 + paramNumber);
+            ArrayList<String> valNames = MyUtilities.subListFromArray(splitNames, 1 + paramNumber, 1 + paramNumber + metricNumber);
+
+            varNames.sort(Comparator.naturalOrder());
+
+            varNames.add(0, "id");
+
+            ArrayList<ArrayList<String>> columns = new ArrayList<>();
+            // ok ykw Im gonna redundantly put that shit in
+
+            resArrList.add(1);
+            resArrList.add(runsssssssssssssssssssssssssssssssss);
+            resArrList.add(spacing);
+            resArrList.add(varNames);
+            resArrList.add(valNames);
+            resArrList.add(columns);
+
+            return resArrList;
+
+        } catch (Exception exc) {
+            System.out.println("CSV reader failed reading initial lines");
+            return resArrList;
+        }
+
+    }
+
     private ArrayList<Object> prepareFileReading(File[] files){
 
         ArrayList<Object> resArrList = new ArrayList<>();
@@ -383,15 +445,15 @@ public class Processor implements ActionListener {
 
     private void processFiles(File[] files) {
 
-        ArrayList<Object> res = prepareFileReading(files);
-
-        int numberOfFiles = (int) res.get(0);
-        int runs = (int) res.get(1);
-        int spacing = (int) res.get(2);
-        ArrayList<String> varNames = (ArrayList<String>) res.get(3);
-        ArrayList<String> valNames = (ArrayList<String>) res.get(4);
-        ArrayList<ArrayList<String>> columns = (ArrayList<ArrayList<String>>) res.get(5);
-        ArrayList<Result> results = new ArrayList<>();
+//        ArrayList<Object> res = prepareFileReading(files);
+//
+//        int numberOfFiles = (int) res.get(0);
+//        int runs = (int) res.get(1);
+//        int spacing = (int) res.get(2);
+//        ArrayList<String> varNames = (ArrayList<String>) res.get(3);
+//        ArrayList<String> valNames = (ArrayList<String>) res.get(4);
+//        ArrayList<ArrayList<String>> columns = (ArrayList<ArrayList<String>>) res.get(5);
+//        ArrayList<Result> results = new ArrayList<>();
 
 //            System.out.println("Number of files: " + numberOfFiles);
 //            System.out.println("spacing: " + spacing);
@@ -409,7 +471,7 @@ public class Processor implements ActionListener {
 //            }
 //            System.out.println(valNamesStr);
 
-        readValuesAndResults(files, columns, results, varNames.size(), runs, spacing);
+//        readValuesAndResults(files, columns, results, varNames.size(), runs, spacing);
 
         if ( true ){
 
