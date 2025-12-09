@@ -65,22 +65,11 @@ public class Processor implements ActionListener {
             int paramNumber = 2;
             int metricNumber = 2;
 
-            ArrayList<String> varNames = MyUtilities.subListFromArray(splitNames, 1, 1 + paramNumber);
+            ArrayList<String> varNames = MyUtilities.subListFromArray(splitNames, 0, 1 + paramNumber);
             ArrayList<String> valNames = MyUtilities.subListFromArray(splitNames, 1 + paramNumber, 1 + paramNumber + metricNumber);
 
-            varNames.sort(Comparator.naturalOrder());
-
-            varNames.add(0, "id");
-
-            ArrayList<ArrayList<String>> columns = new ArrayList<>();
-            // ok ykw Im gonna redundantly put that shit in
-
-            resArrList.add(1);
-            resArrList.add(runsssssssssssssssssssssssssssssssss);
-            resArrList.add(spacing);
             resArrList.add(varNames);
             resArrList.add(valNames);
-            resArrList.add(columns);
 
             return resArrList;
 
@@ -187,6 +176,23 @@ public class Processor implements ActionListener {
             }
 
         }
+    }
+
+    private void newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, ArrayList<Result> results, int noOfVars){
+
+        BufferedReader bReader = null;
+
+        try {
+            bReader = new BufferedReader(new FileReader(file));
+        } catch (IOException exc) {
+
+            paramValues = new ArrayList<>();
+            System.out.println("The app was not able to open the provided file.");
+        }
+
+
+
+
     }
 
     private void readValuesAndResults(File[] files, ArrayList<ArrayList<String>> columns, ArrayList<Result> results, int noOfVars, int runs, int spacing){
@@ -443,17 +449,15 @@ public class Processor implements ActionListener {
         System.out.println(resValString);
     }
 
-    private void processFiles(File[] files) {
+    private void processFiles(File file) {
 
-//        ArrayList<Object> res = prepareFileReading(files);
-//
-//        int numberOfFiles = (int) res.get(0);
-//        int runs = (int) res.get(1);
-//        int spacing = (int) res.get(2);
-//        ArrayList<String> varNames = (ArrayList<String>) res.get(3);
-//        ArrayList<String> valNames = (ArrayList<String>) res.get(4);
-//        ArrayList<ArrayList<String>> columns = (ArrayList<ArrayList<String>>) res.get(5);
-//        ArrayList<Result> results = new ArrayList<>();
+        ArrayList<Object> res = newPrepareFileReading(file);
+
+        ArrayList<String> varNames = (ArrayList<String>) res.get(0);
+        ArrayList<String> valNames = (ArrayList<String>) res.get(1);
+        ArrayList<ArrayList<String>> paramValues = new ArrayList<ArrayList<String>>();
+
+        ArrayList<Result> results = new ArrayList<>();
 
 //            System.out.println("Number of files: " + numberOfFiles);
 //            System.out.println("spacing: " + spacing);
@@ -471,35 +475,35 @@ public class Processor implements ActionListener {
 //            }
 //            System.out.println(valNamesStr);
 
-//        readValuesAndResults(files, columns, results, varNames.size(), runs, spacing);
+//        newReadValuesAndResults(file, columns, results, varNames.size());
 
-        if ( true ){
-
-            System.out.println("Varnames: ");
-            printVarNames(varNames);
-
-            System.out.println("");
-            System.out.println("Let's show the col + result combos of the first two runs of the first two files ");
-
-            System.out.println("");
-            System.out.println("Run 1:");
-            printColStr(columns, 0);
-            printResStr(results, 0);
-
-            System.out.println("Run 2:");
-            printColStr(columns, 1);
-            printResStr(results, 1);
-
-            if (numberOfFiles > 1) {
-                System.out.println("Run " + Integer.toString(runs) + ":");
-                printColStr(columns, runs);
-                printResStr(results, runs);
-
-                System.out.println("Run " + Integer.toString(runs + 1) + ":");
-                printColStr(columns, runs + 1);
-                printResStr(results, runs + 1);
-            }
-        }
+//        if ( true ){
+//
+//            System.out.println("Varnames: ");
+//            printVarNames(varNames);
+//
+//            System.out.println("");
+//            System.out.println("Let's show the col + result combos of the first two runs of the first two files ");
+//
+//            System.out.println("");
+//            System.out.println("Run 1:");
+//            printColStr(columns, 0);
+//            printResStr(results, 0);
+//
+//            System.out.println("Run 2:");
+//            printColStr(columns, 1);
+//            printResStr(results, 1);
+//
+//            if (numberOfFiles > 1) {
+//                System.out.println("Run " + Integer.toString(runs) + ":");
+//                printColStr(columns, runs);
+//                printResStr(results, runs);
+//
+//                System.out.println("Run " + Integer.toString(runs + 1) + ":");
+//                printColStr(columns, runs + 1);
+//                printResStr(results, runs + 1);
+//            }
+//        }
 
         ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(columns, results, runs * numberOfFiles);
 
