@@ -65,6 +65,17 @@ public class Browser extends JPanel {
         updateValues();
 
         varPanel.revalidate();
+
+        //runNumberChanger.getBtnAndBtnContainerParentChain();
+        //runNumberChanger.printButtonUI();
+
+        JFrame frame = (JFrame) SwingUtilities.getRoot(runNumberChanger);
+        SwingUtilities.updateComponentTreeUI(frame);
+
+        frame.invalidate();
+        frame.validate();
+        frame.repaint();
+
     }
 
     public boolean updateRunIds() {

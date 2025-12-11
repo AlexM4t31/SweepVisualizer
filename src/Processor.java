@@ -8,6 +8,9 @@ import java.io.BufferedReader;
 
 public class Processor implements ActionListener {
 
+    private static final int NUMBER_OF_PARAMETERS = 2;
+    private static final int NUMBER_OF_METRICS = 2;
+
     private JButton button;
     private JFileChooser filechooser;
 
@@ -62,11 +65,9 @@ public class Processor implements ActionListener {
             // id, paramnames, metricnames, imagename
             // how many paramNames? hardcoded
 
-            int paramNumber = 2;
-            int metricNumber = 2;
 
-            ArrayList<String> varNames = MyUtilities.subListFromArray(splitNames, 0, 1 + paramNumber);
-            ArrayList<String> valNames = MyUtilities.subListFromArray(splitNames, 1 + paramNumber, 1 + paramNumber + metricNumber);
+            ArrayList<String> varNames = MyUtilities.subListFromArray(splitNames, 0, 1 + NUMBER_OF_PARAMETERS);
+            ArrayList<String> valNames = MyUtilities.subListFromArray(splitNames, 1 + NUMBER_OF_PARAMETERS, 1 + NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS);
 
             resArrList.add(varNames);
             resArrList.add(valNames);
@@ -190,7 +191,41 @@ public class Processor implements ActionListener {
             System.out.println("The app was not able to open the provided file.");
         }
 
+        try {
 
+            String crtLine = null;
+
+            String x = bReader.readLine(); // skip parameter name line
+            System.out.println("x: " + x);
+
+            while ( (crtLine = bReader.readLine()) != null )
+            {
+
+                String[] splitCrtLine = crtLine.replaceAll("\"","").split(",");
+
+                try {
+                    paramValues.add(MyUtilities.subListFromArray(splitCrtLine, 0, 1 + NUMBER_OF_PARAMETERS));
+
+                    ArrayList<String> tmpResValues = MyUtilities.subListFromArray(splitCrtLine,1 + NUMBER_OF_PARAMETERS, 1 + NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS);
+
+                    int arrLen = splitCrtLine.length;
+                    String imageName = splitCrtLine[arrLen-1];
+                    String newResNo = splitCrtLine[0];
+
+                    System.out.println("newResNo: " + newResNo + " for " + crtLine);
+
+                    results.add(new Result(newResNo, imageName, tmpResValues));
+
+                } catch (Exception exc) {
+                    System.out.println("Uhhh problem: " + exc.toString());
+                }
+
+
+            }
+
+        } catch (IOException exc) {
+            System.out.println("nu merge done");
+        }
 
 
     }
@@ -438,7 +473,8 @@ public class Processor implements ActionListener {
 
         Result tmpRes = results.get(resInd);
 
-        ArrayList<String> tmpResValues = tmpRes.getValues();
+        ArrayList<String
+                > tmpResValues = tmpRes.getValues();
 
         String resValString = "";
 
@@ -474,8 +510,11 @@ public class Processor implements ActionListener {
 //                valNamesStr = valNamesStr + valNames.get(i) + " ";
 //            }
 //            System.out.println(valNamesStr);
+//
 
-//        newReadValuesAndResults(file, columns, results, varNames.size());
+        newReadValuesAndResults(file, paramValues, results, varNames.size());
+
+        printResStr(results, 0);
 
 //        if ( true ){
 //
@@ -505,11 +544,11 @@ public class Processor implements ActionListener {
 //            }
 //        }
 
-        ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(columns, results, runs * numberOfFiles);
+        ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(paramValues, results, results.size());
 
         //displayStructuredResults(structuredResults, varNames);
 
-        Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, files[0]);
+        Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
 
         browser.setupBrowsing();
 
@@ -580,7 +619,7 @@ public class Processor implements ActionListener {
             File[] currentFiles = filechooser.getSelectedFiles();
             // the files are sorted by their filenames by default
 
-            processFiles(currentFiles);
+            processFiles(currentFiles[0]);
             //System.out.println(currentFile.getName());
         }
 
