@@ -18,7 +18,7 @@ public class HideBtnAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
 
         varChanger.setVisible(false);
-        varChanger.getSeparator().setVisible(false);
+        //varChanger.getSeparator().setVisible(false);
 
         browser.addHiddenVar(varChanger);
 

@@ -22,12 +22,11 @@ public class VarChanger extends JPanel{
     private String varName;
     private JLabel valLabel;
 
-    private JSeparator separator;
 
     private JPanel theButtonContainer;
     private JButton theButton;
 
-    private static ImageIcon scaleImage(ImageIcon icon, int w, int h) {
+    public static ImageIcon scaleImage(ImageIcon icon, int w, int h) {
         Image img = icon.getImage();
         BufferedImage scaled = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = scaled.createGraphics();
@@ -37,17 +36,18 @@ public class VarChanger extends JPanel{
         return new ImageIcon(scaled);
     }
 
-    public VarChanger(boolean runNumber, Browser browser, ImagePanel imagePanel, Set<String> valueSet, String varName, JSeparator separator) {
+    public VarChanger(boolean runNumber, Browser browser, ImagePanel imagePanel, Set<String> valueSet, String varName) {
 
         this.runNumber = runNumber;
 
         this.browser = browser;
 
-        this.separator = separator;
-
         this.varName = varName;
 
-        setPreferredSize(new Dimension(100, 60));
+        setPreferredSize(new Dimension(250, 100));
+        setMaximumSize(new Dimension(250,100));
+
+        //setBackground(Color.CYAN);
 
         this.imagePanel = imagePanel;
 
@@ -55,6 +55,8 @@ public class VarChanger extends JPanel{
 
         if ( runNumber ) {
             originalValueList = this.valueList;
+
+            System.out.println(valueSet);
         }
 
         setLayout(new GridLayout(2,3));
@@ -67,8 +69,8 @@ public class VarChanger extends JPanel{
 
         JButton hideBtn = new JButton();
 
-        hideBtn.setMinimumSize(new Dimension(60,40));
-        hideBtn.setPreferredSize(new Dimension(60,40));
+        hideBtn.setMinimumSize(new Dimension(60,30));
+        hideBtn.setPreferredSize(new Dimension(60,30));
 
         hideBtnBox.add(hideBtn);
 
@@ -148,6 +150,9 @@ public class VarChanger extends JPanel{
         add(valLabel);
         add(rightBtnContainer);
 
+        setBorder(BorderFactory.createMatteBorder(
+                2, 0, 2, 0, Color.black));
+
 
     }
 
@@ -184,11 +189,11 @@ public class VarChanger extends JPanel{
     }
     public void showChangerAndSeparator(){
         setVisible(true);
-        separator.setVisible(true);
+        //separator.setVisible(true);
     }
-    public JSeparator getSeparator(){
-        return separator;
-    }
+    //public JSeparator getSeparator(){
+    //    return separator;
+    //}
     public void setValueList(ArrayList<String> valueList){
         this.valueList = valueList;
     }
@@ -231,9 +236,7 @@ public class VarChanger extends JPanel{
             throw new NoSuchElementException();
         }
         else {
-            currentValIndex = (currentValIndex + 1) % ( valueList.size() + 1);
-            if ( currentValIndex == 0 )
-                currentValIndex = 1;
+            currentValIndex = (currentValIndex + 1) % valueList.size();
             valLabel.setText(valueList.get(currentValIndex));
         }
         }
@@ -243,9 +246,7 @@ public class VarChanger extends JPanel{
             throw new NoSuchElementException();
         }
         else {
-            currentValIndex = (valueList.size() + currentValIndex - 1) % ( valueList.size() + 1);
-            if ( currentValIndex == 0 )
-                currentValIndex = 1;
+            currentValIndex = (valueList.size() + currentValIndex - 1) % valueList.size();
             valLabel.setText(valueList.get(currentValIndex));
 
         }

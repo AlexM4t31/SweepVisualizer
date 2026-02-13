@@ -132,9 +132,9 @@ public class ProcessorAttempt implements ActionListener {
         return valueNames;
     }
 
-    private ArrayList<Result> getResults(BufferedReader bReader, int spacing) {
+    private HashMap<Integer,Result> getResults(BufferedReader bReader, int spacing) {
 
-        ArrayList<Result> results = new ArrayList<>();
+        HashMap<Integer,Result> results = new HashMap<>();
 
         try {
 
@@ -150,7 +150,7 @@ public class ProcessorAttempt implements ActionListener {
                         tmparr.add(split_line[j]);
                     }
 
-                    results.add(new Result(Integer.toString(i + 1), imageName, tmparr));
+                    results.put( i + 1, new Result(Integer.toString(i + 1), imageName, tmparr));
                 }
 
             }
@@ -163,7 +163,7 @@ public class ProcessorAttempt implements ActionListener {
 
     }
 
-    private ArrayList<Map<String, Set<Result>>> getStructuredResults(ArrayList<ArrayList<String>> columns, ArrayList<Result> results, int runs_start, int runs_end) {
+    private ArrayList<Map<String, Set<Result>>> getStructuredResults(ArrayList<ArrayList<String>> columns, HashMap<Integer,Result> results, int runs_start, int runs_end) {
 
         int n_vars = columns.get(0).size();
 
@@ -193,7 +193,7 @@ public class ProcessorAttempt implements ActionListener {
 
     }
 
-    private void addToStructuredResults(ArrayList<Map<String, Set<Result>>> structuredResults, ArrayList<ArrayList<String>> columns, ArrayList<Result> results, int runs_start, int runs_end) {
+    private void addToStructuredResults(ArrayList<Map<String, Set<Result>>> structuredResults, ArrayList<ArrayList<String>> columns, HashMap<Integer,Result> results, int runs_start, int runs_end) {
 
         int n_vars = columns.get(0).size();
 
@@ -222,7 +222,7 @@ public class ProcessorAttempt implements ActionListener {
 
         ArrayList<String> retValueNames = null;
         ArrayList<String> retVarNames = null;
-        ArrayList<Result> retResults = null;
+        HashMap<Integer,Result> retResults = null;
 
         for (int fileindex = 0; fileindex < myFiles.length; fileindex++) {
 
@@ -261,7 +261,7 @@ public class ProcessorAttempt implements ActionListener {
 
             ArrayList<String> valueNames = null;
 
-            ArrayList<Result> results = null;
+            HashMap<Integer,Result> results = null;
 
             int runs_start = int_file_number * 60 + 1 ;
             int runs_end = ( int_file_number + 1) * 60 ;

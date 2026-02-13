@@ -20,8 +20,9 @@ public class Browser extends JPanel {
 
     private File currentFile;
 
-    private ArrayList<Result> results;
-    public Browser( JPanel varPanel, JPanel valuePanel, ImagePanel imagePanel, ArrayList<String> valueNames, ArrayList<String> varNames, ArrayList<Map<String, Set<Result>>> structuredResults, ArrayList<Result> results, File currentFile ){
+    private HashMap<Integer, Result> results;
+
+    public Browser( JPanel varPanel, JPanel valuePanel, ImagePanel imagePanel, ArrayList<String> valueNames, ArrayList<String> varNames, ArrayList<Map<String, Set<Result>>> structuredResults, HashMap<Integer,Result> results, File currentFile ){
         this.varNames = varNames;
         this.valueNames = valueNames;
         this.valuePanel = valuePanel;
@@ -35,20 +36,20 @@ public class Browser extends JPanel {
 
     public void setupBrowsing(){
 
-        JSeparator jSeparator = new JSeparator();
+        //JSeparator jSeparator = new JSeparator();
 
-        runNumberChanger = new VarChanger(true,this, imagePanel, structuredResults.get(0).keySet(), varNames.get(0), jSeparator);
+        runNumberChanger = new VarChanger(true,this, imagePanel, structuredResults.get(0).keySet(), varNames.get(0));
         varPanel.add( runNumberChanger );
         varChangers.add( runNumberChanger );
-        varPanel.add(new JSeparator());
+        //varPanel.add(new JSeparator());
 
         for ( int i=1; i<varNames.size(); i++ ){
 
-            jSeparator= new JSeparator();
-            VarChanger v = new VarChanger(false, this, imagePanel, structuredResults.get(i).keySet(), varNames.get(i), jSeparator);
+            // jSeparator= new JSeparator();
+            VarChanger v = new VarChanger(false, this, imagePanel, structuredResults.get(i).keySet(), varNames.get(i));
             varPanel.add( v );
             varChangers.add( v );
-            varPanel.add(jSeparator);
+            //varPanel.add(jSeparator);
         }
 
         hiddenVarsPanel = new JPanel();
@@ -79,7 +80,7 @@ public class Browser extends JPanel {
     }
 
     public boolean updateRunIds() {
-        Set<Result> finalSet = new HashSet<Result>(results);
+        Set<Result> finalSet = new HashSet<Result>(results.values());
 
         for ( int i=1; i<structuredResults.size(); i++)
         {
@@ -142,7 +143,7 @@ public class Browser extends JPanel {
 
             int runNo = Integer.parseInt(runNumberChanger.getCurrentVal());
 
-            System.out.println(runNo);
+            //System.out.println(runNo);
 
             Result result = results.get(runNo);
             ArrayList<String> values = result.getValues();
@@ -163,6 +164,7 @@ public class Browser extends JPanel {
         valuePanel.revalidate();
         valuePanel.repaint();
     }
+
     public void updateImage(){
 
         try {
@@ -177,7 +179,8 @@ public class Browser extends JPanel {
 
             String imagePath = dirPath + "\\" + imgName;
 
-            imagePanel.setImage(imagePath);
+            imagePanel.setImage(imagePath, 550, 550);
+
         } catch ( NoSuchElementException exc ) {
             imagePanel.setPlaceholder();
         }
@@ -192,6 +195,8 @@ public class Browser extends JPanel {
         FlowLayout flowLayout = new FlowLayout();
         flowLayout.setAlignment(FlowLayout.LEFT);
         container.setLayout(flowLayout);
+
+        container.setMaximumSize(new Dimension(200,30));
 
         container.add(new JLabel(varChanger.getVarName()));
 

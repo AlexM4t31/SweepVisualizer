@@ -14,7 +14,7 @@ public class ImagePanel extends JPanel  {
 
     }
 
-    public void setImage(String imagePath) {
+    public void setImage(String imagePath, int w, int h) {
         BufferedImage image = null;
         try
         {
@@ -30,14 +30,18 @@ public class ImagePanel extends JPanel  {
                 remove(imageLabel);
             }
 
-            imageLabel = new JLabel(new ImageIcon(image));
+            ImageIcon imgIcon = new ImageIcon(imagePath);
+
+            ImageIcon scaledImgIcon = VarChanger.scaleImage(imgIcon, w, h);
+
+            imageLabel = new JLabel(scaledImgIcon);
 
             add(imageLabel);
         }
     }
 
     public void setPlaceholder(){
-        setImage( ImagePanel.placeholder );
+        setImage( ImagePanel.placeholder , 280, 280);
     }
 
 }

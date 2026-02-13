@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 
 public class Processor implements ActionListener {
 
-    private static final int NUMBER_OF_PARAMETERS = 2;
+    private static final int NUMBER_OF_PARAMETERS = 4;
     private static final int NUMBER_OF_METRICS = 2;
 
     private JButton button;
@@ -179,7 +179,7 @@ public class Processor implements ActionListener {
         }
     }
 
-    private void newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, ArrayList<Result> results, int noOfVars){
+    private void newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, HashMap<Integer, Result> results, int noOfVars){
 
         BufferedReader bReader = null;
 
@@ -198,7 +198,10 @@ public class Processor implements ActionListener {
             String x = bReader.readLine(); // skip parameter name line
             System.out.println("x: " + x);
 
-            while ( (crtLine = bReader.readLine()) != null )
+            //while ( (crtLine = bReader.readLine()) != null )
+            crtLine = bReader.readLine();
+
+            while ( crtLine != null )
             {
 
                 String[] splitCrtLine = crtLine.replaceAll("\"","").split(",");
@@ -214,8 +217,9 @@ public class Processor implements ActionListener {
 
                     System.out.println("newResNo: " + newResNo + " for " + crtLine);
 
-                    results.add(new Result(newResNo, imageName, tmpResValues));
+                    results.put(Integer.parseInt(newResNo), new Result(newResNo, imageName, tmpResValues));
 
+                    crtLine = bReader.readLine();
                 } catch (Exception exc) {
                     System.out.println("Uhhh problem: " + exc.toString());
                 }
@@ -416,28 +420,48 @@ public class Processor implements ActionListener {
 
     }
 
-    private ArrayList<Map<String, Set<Result>>> getStructuredResults(ArrayList<ArrayList<String>> columns, ArrayList<Result> results, int runs) {
+    private ArrayList<Map<String, Set<Result>>> getStructuredResults(ArrayList<ArrayList<String>> idAndParamsRows, HashMap<Integer, Result> results) {
 
-        int n_vars = columns.get(0).size();
+        // NOW WE TURN PARAMS TO COLUMNS, DON'T WE?
+
+        // n_cols gets the number of elements in a given row. as far as I can guess it'll always be the same, so
+        // this should be chill, and, given the current setup, will be equal to 4
+
+        int nCols = idAndParamsRows.get(0).size(); // take first row of whatever 'params' contains, get its size
+
+        int nRows = idAndParamsRows.size();
 
         ArrayList<Map<String, Set<Result>>> structuredResults = new ArrayList<>();
 
-        for ( int i=0; i<n_vars; i++ )
+        for ( int i=0; i< nCols; i++ )
             structuredResults.add(new HashMap<String, Set<Result>>());
 
+        // the question is exceedingly simple:
+        // does the result row index - result id mismatch affect things whatsoever in the following fragment of code?
+        // and the answer is: yes!
+        // because here I'm getting the result with the index of the result row,
+        // rather than with the parsed result Id. so let's fix that.
 
-        for ( int i=0; i<n_vars; i++ ){
-            for ( int j=0; j < runs; j++ )
+        // the index variable names (i,j) are used in the opposite way from normal
+        // so, i goes with cols, j goes with rows.
+        for ( int i=0; i < nCols; i++ ){
+            for ( int j=0; j < nRows; j++ )
             {
-                String currVal = columns.get(j).get(i);
+                String strResId = idAndParamsRows.get(j).get(0);
+
+                int parsedResId = Integer.parseInt(strResId);
+
+                String currVal = idAndParamsRows.get(j).get(i);
+
                 Set<Result> tmpSet = structuredResults.get(i).get(currVal);
+
                 if ( tmpSet != null )
                 {
-                    tmpSet.add( results.get(j) );
+                    tmpSet.add( results.get(parsedResId) );
                 }
                 else {
                     Set<Result> newSet = new HashSet<Result>();
-                    newSet.add( results.get(j) );
+                    newSet.add( results.get(parsedResId) );
                     structuredResults.get(i).put( currVal, newSet );
                 }
             }
@@ -473,8 +497,7 @@ public class Processor implements ActionListener {
 
         Result tmpRes = results.get(resInd);
 
-        ArrayList<String
-                > tmpResValues = tmpRes.getValues();
+        ArrayList<String> tmpResValues = tmpRes.getValues();
 
         String resValString = "";
 
@@ -493,7 +516,7 @@ public class Processor implements ActionListener {
         ArrayList<String> valNames = (ArrayList<String>) res.get(1);
         ArrayList<ArrayList<String>> paramValues = new ArrayList<ArrayList<String>>();
 
-        ArrayList<Result> results = new ArrayList<>();
+        HashMap<Integer, Result> results = new HashMap<>();
 
 //            System.out.println("Number of files: " + numberOfFiles);
 //            System.out.println("spacing: " + spacing);
@@ -514,7 +537,8 @@ public class Processor implements ActionListener {
 
         newReadValuesAndResults(file, paramValues, results, varNames.size());
 
-        printResStr(results, 0);
+        //System.out.println("Printing result string for result with index 0.");
+        //printResStr(results, 0);
 
 //        if ( true ){
 //
@@ -544,7 +568,8 @@ public class Processor implements ActionListener {
 //            }
 //        }
 
-        ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(paramValues, results, results.size());
+
+        ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(paramValues, results);
 
         //displayStructuredResults(structuredResults, varNames);
 
@@ -644,7 +669,7 @@ public class Processor implements ActionListener {
                 while ( iterTwo.hasNext() )
                 {
                     Result tmpResult = (Result) iterTwo.next();
-                    resultString = resultString + "   " + tmpResult.getImageName();
+                    resultString = resultString + "   " + tmpResult;//.getImageName();
                 }
                 System.out.println(resultString);
 
