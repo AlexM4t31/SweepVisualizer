@@ -38,12 +38,58 @@ public class Main {
 
         topPanel.setLayout(new GridBagLayout());
 
+        JPanel paramNoPanel = new JPanel();
+        paramNoPanel.setLayout(new BoxLayout(paramNoPanel, BoxLayout.Y_AXIS));
+
+        JTextField paramNoTextField = new JTextField();
+        JLabel paramNoLabel = new JLabel("No. of params:");
+
+        GridBagConstraints topPanelCOne = new GridBagConstraints();
+
+        topPanelCOne.weightx = 1;
+        topPanelCOne.gridheight = 1;
+        topPanelCOne.gridwidth = 1;
+        topPanelCOne.fill = GridBagConstraints.HORIZONTAL;
+        topPanelCOne.gridx = 0;
+        topPanelCOne.gridy = 0;
+
+        JPanel metricNoPanel = new JPanel();
+        metricNoPanel.setLayout(new BoxLayout(metricNoPanel, BoxLayout.Y_AXIS));
+
+        JLabel metricNoLabel = new JLabel("No. of metrics:");
+        JTextField metricNoTextField = new JTextField();
+
+        GridBagConstraints topPanelCTwo = new GridBagConstraints();
+
+        topPanelCTwo.weightx = 1;
+        topPanelCTwo.fill = GridBagConstraints.HORIZONTAL;
+        topPanelCTwo.gridx = 1;
+        topPanelCTwo.gridy = 0;
+        topPanelCTwo.gridheight = 1;
+        topPanelCTwo.gridwidth = 1;
+
         JButton button =  new JButton("Search for CSV");
         button.setMinimumSize(new Dimension(200, 60));
         button.setPreferredSize(new Dimension(200, 60));
         button.setMaximumSize(new Dimension(200, 60));
 
-        topPanel.add(button); // Adding a component to a container with a gridbaglayout without and gridbagconstraints leads to centering the component
+        GridBagConstraints topPanelCThree = new GridBagConstraints();
+        // topPanelCThree.weightx = 1;
+        topPanelCThree.fill = GridBagConstraints.HORIZONTAL;
+        topPanelCThree.gridx = 0;
+        topPanelCThree.gridy = 1;
+        topPanelCThree.gridwidth = 2;
+        topPanelCThree.gridheight = 1;
+
+        paramNoPanel.add(paramNoLabel);
+        paramNoPanel.add(paramNoTextField);
+
+        metricNoPanel.add(metricNoLabel);
+        metricNoPanel.add(metricNoTextField);
+
+        topPanel.add(paramNoPanel, topPanelCOne);
+        topPanel.add(metricNoPanel, topPanelCTwo);
+        topPanel.add(button,topPanelCThree); // Adding a component to a container with a gridbaglayout without and gridbagconstraints leads to centering the component
 
         // create bottom panel structure
 
@@ -131,7 +177,7 @@ public class Main {
 
         bottomPanel.add(btmRightPanel, bottomPanelConstraintsTwo);
 
-        JComponent[] r = { button, resultsPanel, imagePanel, topPanel, valuePanel};
+        JComponent[] r = { button, resultsPanel, imagePanel, topPanel, valuePanel, paramNoTextField, metricNoTextField};
 
         frame.pack();
         frame.setVisible(true);
@@ -149,8 +195,10 @@ public class Main {
         ImagePanel imagePanel = ( ImagePanel ) components[2];
         JPanel topPanel = ( JPanel ) components[3];
         JPanel valuePanel = ( JPanel ) components[4];
+        JTextField paramNoTextField = ( JTextField ) components[5];
+        JTextField metricNoTextField = ( JTextField ) components[6];
 
-        Processor processor = new Processor( topPanel, resultsPanel, imagePanel, valuePanel );
+        Processor processor = new Processor( topPanel, resultsPanel, imagePanel, valuePanel, paramNoTextField, metricNoTextField );
 
         button.addActionListener(processor);
 

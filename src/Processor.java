@@ -8,8 +8,8 @@ import java.io.BufferedReader;
 
 public class Processor implements ActionListener {
 
-    private static final int NUMBER_OF_PARAMETERS = 4;
-    private static final int NUMBER_OF_METRICS = 2;
+    private static int NUMBER_OF_PARAMETERS = 0;
+    private static int NUMBER_OF_METRICS = 0;
 
     private JButton button;
     private JFileChooser filechooser;
@@ -18,14 +18,19 @@ public class Processor implements ActionListener {
 
     private JPanel varsPanel, topPanel, valuePanel;
 
+    private JTextField paramNoTextField, metricNoTextField;
+
     private ImagePanel imagePanel;
 
-    Processor(JPanel topPanel, JPanel varsPanel, ImagePanel imagePanel, JPanel valuePanel) {
+    Processor(JPanel topPanel, JPanel varsPanel, ImagePanel imagePanel, JPanel valuePanel, JTextField paramNoTextField, JTextField metricNoTextField) {
 
         this.varsPanel = varsPanel;
         this.imagePanel = imagePanel;
         this.topPanel = topPanel;
         this.valuePanel = valuePanel;
+
+        this.paramNoTextField = paramNoTextField;
+        this.metricNoTextField = metricNoTextField;
 
         filechooser = new JFileChooser();
         filechooser.setMultiSelectionEnabled(true);
@@ -640,6 +645,9 @@ public class Processor implements ActionListener {
         int r = filechooser.showOpenDialog(topPanel);
 
         if ( r == JFileChooser.APPROVE_OPTION ){
+
+            NUMBER_OF_PARAMETERS = Integer.parseInt(paramNoTextField.getText());
+            NUMBER_OF_METRICS = Integer.parseInt(metricNoTextField.getText());
 
             File[] currentFiles = filechooser.getSelectedFiles();
             // the files are sorted by their filenames by default
