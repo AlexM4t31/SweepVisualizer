@@ -174,15 +174,31 @@ public class Browser extends JPanel {
 
             String filePath = currentFile.getPath();
             int ind = filePath.lastIndexOf("\\");
+            
+            boolean macKindaSlash = false;
+            
+            if ( ind == -1 )
+            {
+                macKindaSlash = true;
+                ind = filePath.lastIndexOf("/");
+            }
+
             String dirPath = filePath.substring(0, ind);
             System.out.println(dirPath);
 
-            String imagePath = dirPath + "\\" + imgName;
+            String imagePath = "";
+
+            if ( !macKindaSlash ) {
+                imagePath = dirPath + "\\" + imgName;
+            } else
+            {
+                imagePath = dirPath + "/" + imgName;
+            }
 
             imagePanel.setImage(imagePath, 550, 550);
 
         } catch ( NoSuchElementException exc ) {
-            imagePanel.setPlaceholder();
+            imagePanel.removeImage();
         }
 
         imagePanel.revalidate();

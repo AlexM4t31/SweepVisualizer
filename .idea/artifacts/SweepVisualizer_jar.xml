@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="SweepVisualizer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SweepVisualizer_jar</output-path>
+    <root id="archive" name="SweepVisualizer.jar">
+      <element id="module-output" name="SweepVisualizer" />
+    </root>
+  </artifact>
+</component>

@@ -159,7 +159,7 @@ public class Main {
         imagePanel.setPreferredSize(new Dimension(550, 550));
         imagePanel.setMaximumSize((new Dimension(550,550)));
 
-        imagePanel.setPlaceholder();
+        imagePanel.removeImage();
 
         //imagePanel.setBackground(Color.RED);
 

@@ -40,8 +40,11 @@ public class ImagePanel extends JPanel  {
         }
     }
 
-    public void setPlaceholder(){
-        setImage( ImagePanel.placeholder , 280, 280);
+    public void removeImage(){
+        if ( imageLabel != null )
+        {
+            remove(imageLabel);
+        }
     }
 
 }
