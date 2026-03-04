@@ -48,8 +48,8 @@ public class Processor implements ActionListener {
         try {
             bReader = new BufferedReader(new FileReader(file));
         } catch (IOException exc) {
-            System.out.println("The app was not able to open the provided file.");
-            return resArrList;
+            //System.out.println("The app was not able to open the provided file.");
+            return resArrList; // the arraylist that gets returned at this moment is gonna be empty
         }
 
         try {
@@ -80,7 +80,8 @@ public class Processor implements ActionListener {
             return resArrList;
 
         } catch (Exception exc) {
-            System.out.println("CSV reader failed reading initial lines");
+            // if things fail I'm almost certain they do before the resArrList gets modified, so
+            // its fine to just return as such
             return resArrList;
         }
 
@@ -184,59 +185,88 @@ public class Processor implements ActionListener {
         }
     }
 
-    private void newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, HashMap<Integer, Result> results, int noOfVars){
+    private boolean newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, HashMap<Integer, Result> results, int noOfVars){
+
+        int expectedToksPerLine = NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS + 2;
 
         BufferedReader bReader = null;
 
         try {
             bReader = new BufferedReader(new FileReader(file));
         } catch (IOException exc) {
-
             paramValues = new ArrayList<>();
-            System.out.println("The app was not able to open the provided file.");
+            JOptionPane.showMessageDialog(topPanel.getRootPane(), "Invalid file, could not read.");
+
+            return false;
         }
 
+        String crtLine = null;
+
         try {
-
-            String crtLine = null;
-
             String x = bReader.readLine(); // skip parameter name line
-            System.out.println("x: " + x);
+            // System.out.println("x: " + x);
 
             //while ( (crtLine = bReader.readLine()) != null )
             crtLine = bReader.readLine();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(topPanel.getRootPane(), "Failed to read file.");
 
-            while ( crtLine != null )
+            return false;
+        }
+
+        while ( crtLine != null )
+        {
+
+            String[] splitCrtLine = crtLine.replaceAll("\"","").split(",");
+
+            // check number of expected elements/tokens for current line
+            if (splitCrtLine.length != expectedToksPerLine)
             {
+                String firstElem = splitCrtLine[0];
 
-                String[] splitCrtLine = crtLine.replaceAll("\"","").split(",");
+                JOptionPane.showMessageDialog(topPanel.getRootPane(), "Invalid number of elements on line with id: " + firstElem);
 
-                try {
-                    paramValues.add(MyUtilities.subListFromArray(splitCrtLine, 0, 1 + NUMBER_OF_PARAMETERS));
-
-                    ArrayList<String> tmpResValues = MyUtilities.subListFromArray(splitCrtLine,1 + NUMBER_OF_PARAMETERS, 1 + NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS);
-
-                    int arrLen = splitCrtLine.length;
-                    String imageName = splitCrtLine[arrLen-1];
-                    String newResNo = splitCrtLine[0];
-
-                    System.out.println("newResNo: " + newResNo + " for " + crtLine);
-
-                    results.put(Integer.parseInt(newResNo), new Result(newResNo, imageName, tmpResValues));
-
-                    crtLine = bReader.readLine();
-                } catch (Exception exc) {
-                    System.out.println("Uhhh problem: " + exc.toString());
-                }
-
-
+                return false;
             }
 
-        } catch (IOException exc) {
-            System.out.println("nu merge done");
+            try {
+                paramValues.add(MyUtilities.subListFromArray(splitCrtLine, 0, 1 + NUMBER_OF_PARAMETERS));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(topPanel.getRootPane(), "Failed to extract tokenized line sub-list, check file structure.");
+
+                return false;
+            }
+
+            ArrayList<String> tmpResValues = null;
+
+            try {
+                tmpResValues = MyUtilities.subListFromArray(splitCrtLine, 1 + NUMBER_OF_PARAMETERS, 1 + NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(topPanel.getRootPane(), "Failed to extract tokenized line sub-list, check file structure.");
+
+                return false;
+            }
+
+            int arrLen = splitCrtLine.length;
+            String imageName = splitCrtLine[arrLen-1];
+            String newResNo = splitCrtLine[0];
+
+            // System.out.println("newResNo: " + newResNo + " for " + crtLine);
+
+            results.put(Integer.parseInt(newResNo), new Result(newResNo, imageName, tmpResValues));
+
+            try {
+                crtLine = bReader.readLine();
+            } catch (IOException e) {
+
+
+                JOptionPane.showMessageDialog(topPanel.getRootPane(), "Failed to read next line after id: " + newResNo);
+            }
+
         }
 
 
+        return true;
     }
 
     private void readValuesAndResults(File[] files, ArrayList<ArrayList<String>> columns, ArrayList<Result> results, int noOfVars, int runs, int spacing){
@@ -517,72 +547,79 @@ public class Processor implements ActionListener {
 
         ArrayList<Object> res = newPrepareFileReading(file);
 
-        ArrayList<String> varNames = (ArrayList<String>) res.get(0);
-        ArrayList<String> valNames = (ArrayList<String>) res.get(1);
-        ArrayList<ArrayList<String>> paramValues = new ArrayList<ArrayList<String>>();
-
-        HashMap<Integer, Result> results = new HashMap<>();
-
-//            System.out.println("Number of files: " + numberOfFiles);
-//            System.out.println("spacing: " + spacing);
-//            System.out.println("runs: " + runs);
-//
-//            String varNamesStr = "";
-//            for (int i = 0; i < varNames.size(); i++) {
-//                varNamesStr = varNamesStr + varNames.get(i) + " ";
-//            }
-//            System.out.println(varNamesStr);
-//
-//            String valNamesStr = "";
-//            for (int i = 0; i < valNames.size(); i++) {
-//                valNamesStr = valNamesStr + valNames.get(i) + " ";
-//            }
-//            System.out.println(valNamesStr);
-//
-
-        newReadValuesAndResults(file, paramValues, results, varNames.size());
-
-        //System.out.println("Printing result string for result with index 0.");
-        //printResStr(results, 0);
-
-//        if ( true ){
-//
-//            System.out.println("Varnames: ");
-//            printVarNames(varNames);
-//
-//            System.out.println("");
-//            System.out.println("Let's show the col + result combos of the first two runs of the first two files ");
-//
-//            System.out.println("");
-//            System.out.println("Run 1:");
-//            printColStr(columns, 0);
-//            printResStr(results, 0);
-//
-//            System.out.println("Run 2:");
-//            printColStr(columns, 1);
-//            printResStr(results, 1);
-//
-//            if (numberOfFiles > 1) {
-//                System.out.println("Run " + Integer.toString(runs) + ":");
-//                printColStr(columns, runs);
-//                printResStr(results, runs);
-//
-//                System.out.println("Run " + Integer.toString(runs + 1) + ":");
-//                printColStr(columns, runs + 1);
-//                printResStr(results, runs + 1);
-//            }
-//        }
-
-
-        ArrayList<Map<String,Set<Result>>> structuredResults = getStructuredResults(paramValues, results);
-
-        //displayStructuredResults(structuredResults, varNames);
-
-        Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
-
-        browser.setupBrowsing();
+        if (res.isEmpty())
+        {
+            JOptionPane.showMessageDialog(topPanel.getRootPane(), "App failed processing first line.");
 
         }
+        else {
+
+            ArrayList<String> varNames = (ArrayList<String>) res.get(0);
+            ArrayList<String> valNames = (ArrayList<String>) res.get(1);
+            ArrayList<ArrayList<String>> paramValues = new ArrayList<ArrayList<String>>();
+
+            HashMap<Integer, Result> results = new HashMap<>();
+
+            //            System.out.println("Number of files: " + numberOfFiles);
+            //            System.out.println("spacing: " + spacing);
+            //            System.out.println("runs: " + runs);
+            //
+            //            String varNamesStr = "";
+            //            for (int i = 0; i < varNames.size(); i++) {
+            //                varNamesStr = varNamesStr + varNames.get(i) + " ";
+            //            }
+            //            System.out.println(varNamesStr);
+            //
+            //            String valNamesStr = "";
+            //            for (int i = 0; i < valNames.size(); i++) {
+            //                valNamesStr = valNamesStr + valNames.get(i) + " ";
+            //            }
+            //            System.out.println(valNamesStr);
+            //
+
+            boolean valuesReadSuccessfully = newReadValuesAndResults(file, paramValues, results, varNames.size());
+
+            //System.out.println("Printing result string for result with index 0.");
+            //printResStr(results, 0);
+
+            //        if ( true ){
+            //
+            //            System.out.println("Varnames: ");
+            //            printVarNames(varNames);
+            //
+            //            System.out.println("");
+            //            System.out.println("Let's show the col + result combos of the first two runs of the first two files ");
+            //
+            //            System.out.println("");
+            //            System.out.println("Run 1:");
+            //            printColStr(columns, 0);
+            //            printResStr(results, 0);
+            //
+            //            System.out.println("Run 2:");
+            //            printColStr(columns, 1);
+            //            printResStr(results, 1);
+            //
+            //            if (numberOfFiles > 1) {
+            //                System.out.println("Run " + Integer.toString(runs) + ":");
+            //                printColStr(columns, runs);
+            //                printResStr(results, runs);
+            //
+            //                System.out.println("Run " + Integer.toString(runs + 1) + ":");
+            //                printColStr(columns, runs + 1);
+            //                printResStr(results, runs + 1);
+            //            }
+            //        }
+
+            if ( valuesReadSuccessfully ){
+                ArrayList<Map<String, Set<Result>>> structuredResults = getStructuredResults(paramValues, results);
+
+                //displayStructuredResults(structuredResults, varNames);
+
+                Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
+
+                browser.setupBrowsing(); }
+            }
+    }
 
 //    private void legacyProcessFiles(File[] files){
 //
@@ -666,6 +703,48 @@ public class Processor implements ActionListener {
         return true;
     }
 
+    boolean validateFileStructureFromFirstLines( File file ){
+        BufferedReader bReader = null;
+
+        boolean validFirstLines = true;
+
+        try {
+            bReader = new BufferedReader(new FileReader(file));
+        } catch (IOException exc) {
+            validFirstLines = false;
+        }
+
+        try {
+            String namesLine = bReader.readLine().replaceAll("\"", "");
+
+            String[] splitNames = namesLine.split(",");
+
+            if ( NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS + 2 != splitNames.length )
+                validFirstLines = false;
+
+        } catch (IOException exc) {
+            validFirstLines = false;
+        }
+
+        try {
+            String firstResultLine = bReader.readLine().replaceAll("\"", "");
+
+            String[] splitData = firstResultLine.split(",");
+
+            if ( NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS + 2 != splitData.length )
+                validFirstLines = false;
+
+        } catch (IOException exc) {
+            validFirstLines =  false;
+        }
+
+    if (!validFirstLines){
+        JOptionPane.showMessageDialog(topPanel.getRootPane(), "File has invalid structure.");
+    }
+
+    return validFirstLines;
+    }
+
     public void actionPerformed( ActionEvent e ) {
 
         boolean validInputs = parseNumInputs();
@@ -675,16 +754,18 @@ public class Processor implements ActionListener {
         if ( r == JFileChooser.APPROVE_OPTION ){
 
             File[] currentFiles = filechooser.getSelectedFiles();
+
+            File crtFile = currentFiles[0];
+
             // the files are sorted by their filenames by default
 
             // validation function, otherwise throws shit
+            boolean validFirstLines = validateFileStructureFromFirstLines(crtFile);
 
-            System.out.println("This is after the getSelectedFiles call.");
+            if (validFirstLines) {
+                processFiles(crtFile);
+            }
 
-            // if validation function works, only then go forward with the processing
-
-            processFiles(currentFiles[0]);
-            //System.out.println(currentFile.getName());
         }
 
     }
