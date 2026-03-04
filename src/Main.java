@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
 
-    private static JComponent[] buildGUI() {
+    protected static JComponent[] buildGUI() {
 
         JFrame frame = new JFrame();
         frame.getContentPane().setLayout(new GridBagLayout());
@@ -89,7 +89,9 @@ public class Main {
 
         topPanel.add(paramNoPanel, topPanelCOne);
         topPanel.add(metricNoPanel, topPanelCTwo);
-        topPanel.add(button,topPanelCThree); // Adding a component to a container with a gridbaglayout without and gridbagconstraints leads to centering the component
+        topPanel.add(button,topPanelCThree);
+
+
 
         // create bottom panel structure
 

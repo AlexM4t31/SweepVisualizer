@@ -138,7 +138,13 @@ public class VarChanger extends JPanel{
         else
             rightBtnAction = new BtnAction(this, browser, BtnAction.RIGHT);
         rightBtn.setAction(rightBtnAction);
-        rightBtn.setText(">");
+        // rightBtn.setText(">");
+
+        ImageIcon resetIcon = new ImageIcon("C:\\Work\\Code\\SweepVisualizer\\src\\reset.png");
+        //System.out.println("initial icon dimensions: " + resetIcon.getIconWidth() + "x" + resetIcon.getIconHeight());
+
+        ImageIcon scaledIcon = scaleImage(resetIcon, 32, 32);
+        rightBtn.setIcon(scaledIcon);
 
         rightBtnContainer.add(rightBtn);
 

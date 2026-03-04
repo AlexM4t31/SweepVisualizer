@@ -641,16 +641,47 @@ public class Processor implements ActionListener {
 //
 //    }
 
+    protected boolean parseNumInputs(){
+
+        boolean validParamNo = true;
+        boolean validMetricNo = true;
+
+        try {
+            NUMBER_OF_PARAMETERS = Integer.parseInt(paramNoTextField.getText());
+        } catch (NumberFormatException nfe) {
+            validParamNo = false;
+        }
+
+        try {
+            NUMBER_OF_METRICS = Integer.parseInt(metricNoTextField.getText());
+        } catch (NumberFormatException nfe) {
+            validMetricNo = false;
+        }
+
+        if ( !validParamNo || !validMetricNo ){
+            JOptionPane.showMessageDialog(topPanel.getRootPane(), "Invalid inputs to numerical fields.");
+
+            return false;
+        }
+        return true;
+    }
+
     public void actionPerformed( ActionEvent e ) {
+
+        boolean validInputs = parseNumInputs();
+
         int r = filechooser.showOpenDialog(topPanel);
 
         if ( r == JFileChooser.APPROVE_OPTION ){
 
-            NUMBER_OF_PARAMETERS = Integer.parseInt(paramNoTextField.getText());
-            NUMBER_OF_METRICS = Integer.parseInt(metricNoTextField.getText());
-
             File[] currentFiles = filechooser.getSelectedFiles();
             // the files are sorted by their filenames by default
+
+            // validation function, otherwise throws shit
+
+            System.out.println("This is after the getSelectedFiles call.");
+
+            // if validation function works, only then go forward with the processing
 
             processFiles(currentFiles[0]);
             //System.out.println(currentFile.getName());
