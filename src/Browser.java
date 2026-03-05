@@ -139,7 +139,7 @@ public class Browser extends JPanel {
     public void updateValues(){
 
         try {
-            System.out.println("Reaches the try block");
+            // System.out.println("Reaches the try block");
 
             int runNo = Integer.parseInt(runNumberChanger.getCurrentVal());
 

@@ -6,6 +6,10 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,37 +54,29 @@ class ProcessorTest {
         paramNoTextField.setText("a");
         metricNoTextField.setText("2");
 
-        button.doClick();
-
-        Component[] componentsOfResPanel = resultsPanel.getComponents();
-
-        assertEquals(0, componentsOfResPanel.length);
-    }
 
 
-    void metricNumInputsInvalidParamNo() {
-        paramNoTextField.setText("4");
-        metricNoTextField.setText("a");
-
-        button.doClick();
-
-        Component[] componentsOfResPanel = resultsPanel.getComponents();
-
-        assertEquals(0, componentsOfResPanel.length);
-    }
-
-    void bothNumInputsInvalidParamNo() {
-        paramNoTextField.setText("4");
-        metricNoTextField.setText("2");
-
-        button.doClick();
-
-        Component[] componentsOfResPanel = resultsPanel.getComponents();
-
-        assertEquals(0, componentsOfResPanel.length);
+        assertFalse(processor.parseNumInputs());
     }
 
     @Test
+    void parseNumInputsInvalidMetricNo() {
+        paramNoTextField.setText("4");
+        metricNoTextField.setText("a");
+
+
+        assertFalse(processor.parseNumInputs());
+    }
+
+    @Test
+    void parseNumInputsBothValid() {
+        paramNoTextField.setText("4");
+        metricNoTextField.setText("2");
+
+        assertTrue(processor.parseNumInputs());
+    }
+
+    //@Test
     void actionPerformedParamNoInvalid() {
 
        paramNoTextField.setText("A");
@@ -90,7 +86,49 @@ class ProcessorTest {
 
     }
 
+    // test confirming that files with repeat ids get btfo'd
 
+    // test for getting the right instance when you put its id in in the runNumberVarChanger
+
+    // test for getting sth if the values are there
+
+    @Test
+    void repeatIdsDetectedAsInvalid(){
+        File crtFile = new File("/Users/mateia/Work/sweepVis/SweepVisualizer/exampleForSweepVisualizer/testrepeatids.csv");
+
+        paramNoTextField.setText("4");
+        metricNoTextField.setText("2");
+
+        boolean validInputs = processor.parseNumInputs();
+
+        boolean validFirstLines = processor.validateFileStructureFromFirstLines(crtFile);
+
+        assertTrue(validInputs);
+        assertTrue(validFirstLines);
+
+        ArrayList<Map<String, Set<Result>>> structuredRes = processor.processFiles(crtFile);
+
+        assertNull(structuredRes);
+    }
+
+    @Test
+    void emptyIdDetectedAsInvalid(){
+        File crtFile = new File("/Users/mateia/Work/sweepVis/SweepVisualizer/exampleForSweepVisualizer/testemptyid.csv");
+
+        paramNoTextField.setText("4");
+        metricNoTextField.setText("2");
+
+        boolean validInputs = processor.parseNumInputs();
+
+        boolean validFirstLines = processor.validateFileStructureFromFirstLines(crtFile);
+
+        assertTrue(validInputs);
+        assertTrue(validFirstLines);
+
+        ArrayList<Map<String, Set<Result>>> structuredRes = processor.processFiles(crtFile);
+
+        assertNull(structuredRes);
+    }
 
 
 

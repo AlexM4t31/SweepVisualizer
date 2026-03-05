@@ -162,6 +162,10 @@ public class VarChanger extends JPanel{
 
     }
 
+    protected Browser getBrowser(){
+        return browser;
+    }
+
     public void getBtnAndBtnContainerParentChain() {
         System.out.println("Is the button showing:" + theButton.isShowing());
 
@@ -215,6 +219,10 @@ public class VarChanger extends JPanel{
 
     public void setCurrentValToNothing(){
         this.valLabel.setText("X");
+    }
+
+    protected boolean getRunNumber() {
+        return runNumber;
     }
 
     public void runNumberChangerResetValueList(){

@@ -10,6 +10,7 @@ public class Main {
     protected static JComponent[] buildGUI() {
 
         JFrame frame = new JFrame();
+
         frame.getContentPane().setLayout(new GridBagLayout());
 
         //frame.setPreferredSize(new Dimension(2000,1000));

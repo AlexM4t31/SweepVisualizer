@@ -48,7 +48,7 @@ public class Processor implements ActionListener {
         try {
             bReader = new BufferedReader(new FileReader(file));
         } catch (IOException exc) {
-            //System.out.println("The app was not able to open the provided file.");
+            // System.out.println("The app was not able to open the provided file.");
             return resArrList; // the arraylist that gets returned at this moment is gonna be empty
         }
 
@@ -187,6 +187,8 @@ public class Processor implements ActionListener {
 
     private boolean newReadValuesAndResults(File file, ArrayList<ArrayList<String>> paramValues, HashMap<Integer, Result> results, int noOfVars){
 
+        ArrayList<Integer> idCount = new ArrayList<>();
+
         int expectedToksPerLine = NUMBER_OF_PARAMETERS + NUMBER_OF_METRICS + 2;
 
         BufferedReader bReader = null;
@@ -219,13 +221,38 @@ public class Processor implements ActionListener {
 
             String[] splitCrtLine = crtLine.replaceAll("\"","").split(",");
 
+            String firstElem = splitCrtLine[0];
             // check number of expected elements/tokens for current line
             if (splitCrtLine.length != expectedToksPerLine)
             {
-                String firstElem = splitCrtLine[0];
-
                 JOptionPane.showMessageDialog(topPanel.getRootPane(), "Invalid number of elements on line with id: " + firstElem);
 
+                return false;
+            }
+
+            Integer crtId = null;
+            try {
+                crtId = Integer.parseInt(firstElem);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(topPanel.getRootPane(), "Invalid id: " + firstElem);
+
+                return false;
+            }
+
+            if (crtId >= idCount.size())
+            {
+                int entriesToAdd = crtId - idCount.size() + 1;
+
+                for (int j=0;j<entriesToAdd;j++){
+                    idCount.add(Integer.valueOf(0));
+                }
+            }
+
+            Integer crtCount = idCount.get(crtId);
+            idCount.set(crtId, crtCount + 1);
+
+            if (idCount.get(crtId) > 1)
+            {
                 return false;
             }
 
@@ -459,8 +486,9 @@ public class Processor implements ActionListener {
 
         // NOW WE TURN PARAMS TO COLUMNS, DON'T WE?
 
-        // n_cols gets the number of elements in a given row. as far as I can guess it'll always be the same, so
-        // this should be chill, and, given the current setup, will be equal to 4
+        // n_cols gets the number of elements in a given row.
+        // previous code has already checked that all lines have the same
+        // number of tokens
 
         int nCols = idAndParamsRows.get(0).size(); // take first row of whatever 'params' contains, get its size
 
@@ -468,7 +496,7 @@ public class Processor implements ActionListener {
 
         ArrayList<Map<String, Set<Result>>> structuredResults = new ArrayList<>();
 
-        for ( int i=0; i< nCols; i++ )
+        for ( int i=0; i < nCols; i++ )
             structuredResults.add(new HashMap<String, Set<Result>>());
 
         // the question is exceedingly simple:
@@ -543,7 +571,7 @@ public class Processor implements ActionListener {
         System.out.println(resValString);
     }
 
-    private void processFiles(File file) {
+    protected ArrayList<Map<String, Set<Result>>> processFiles(File file) {
 
         ArrayList<Object> res = newPrepareFileReading(file);
 
@@ -551,6 +579,7 @@ public class Processor implements ActionListener {
         {
             JOptionPane.showMessageDialog(topPanel.getRootPane(), "App failed processing first line.");
 
+            return null;
         }
         else {
 
@@ -560,55 +589,7 @@ public class Processor implements ActionListener {
 
             HashMap<Integer, Result> results = new HashMap<>();
 
-            //            System.out.println("Number of files: " + numberOfFiles);
-            //            System.out.println("spacing: " + spacing);
-            //            System.out.println("runs: " + runs);
-            //
-            //            String varNamesStr = "";
-            //            for (int i = 0; i < varNames.size(); i++) {
-            //                varNamesStr = varNamesStr + varNames.get(i) + " ";
-            //            }
-            //            System.out.println(varNamesStr);
-            //
-            //            String valNamesStr = "";
-            //            for (int i = 0; i < valNames.size(); i++) {
-            //                valNamesStr = valNamesStr + valNames.get(i) + " ";
-            //            }
-            //            System.out.println(valNamesStr);
-            //
-
             boolean valuesReadSuccessfully = newReadValuesAndResults(file, paramValues, results, varNames.size());
-
-            //System.out.println("Printing result string for result with index 0.");
-            //printResStr(results, 0);
-
-            //        if ( true ){
-            //
-            //            System.out.println("Varnames: ");
-            //            printVarNames(varNames);
-            //
-            //            System.out.println("");
-            //            System.out.println("Let's show the col + result combos of the first two runs of the first two files ");
-            //
-            //            System.out.println("");
-            //            System.out.println("Run 1:");
-            //            printColStr(columns, 0);
-            //            printResStr(results, 0);
-            //
-            //            System.out.println("Run 2:");
-            //            printColStr(columns, 1);
-            //            printResStr(results, 1);
-            //
-            //            if (numberOfFiles > 1) {
-            //                System.out.println("Run " + Integer.toString(runs) + ":");
-            //                printColStr(columns, runs);
-            //                printResStr(results, runs);
-            //
-            //                System.out.println("Run " + Integer.toString(runs + 1) + ":");
-            //                printColStr(columns, runs + 1);
-            //                printResStr(results, runs + 1);
-            //            }
-            //        }
 
             if ( valuesReadSuccessfully ){
                 ArrayList<Map<String, Set<Result>>> structuredResults = getStructuredResults(paramValues, results);
@@ -617,66 +598,15 @@ public class Processor implements ActionListener {
 
                 Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
 
-                browser.setupBrowsing(); }
+                browser.setupBrowsing();
+
+                return structuredResults;
+            }
+            else {
+                return null;
+            }
             }
     }
-
-//    private void legacyProcessFiles(File[] files){
-//
-//        BufferedReader bReader = null;
-//        try {
-//            bReader = new BufferedReader(new FileReader(currentFile));
-//        } catch ( IOException exc ) {
-//            // add popup
-//            bReader = null;
-//            System.out.println("The app was not able to open the provided file.");
-//        }
-//
-//        ArrayList<ArrayList<String>> columns = null;
-//
-//        ArrayList<String> varNames = null;
-//
-//        ArrayList<String> valueNames= null;
-//
-//        ArrayList<Result> results = null;
-//
-//        ArrayList<Map<String,Set<Result>>> structuredResults = null;
-//
-//        int runs = 12960;
-//        int spacing = 31;
-//
-////        if ( bReader!= null ) {
-////            int[] dataParams = getDataParams(bReader);
-////            runs = dataParams[0];
-////            spacing = dataParams[1];
-////        }
-//
-//        if ( runs > 0 )
-//        {
-//            ArrayList[] returnedValues = readValues(bReader, runs, spacing);
-//            columns = returnedValues[0];
-//            varNames = returnedValues[1];
-//        }
-//
-//        if ( columns!= null )
-//        {
-//            valueNames = getValueNames(bReader, spacing);
-//        }
-//
-//        if ( valueNames!= null )
-//        {
-//            results = getResults(bReader, spacing);
-//        }
-//
-//        structuredResults = getStructuredResults(columns, results, runs);
-//
-//        displayStructuredResults(structuredResults, varNames);
-//
-//        Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valueNames, varNames, structuredResults, results, currentFile);
-//
-//        browser.setupBrowsing();
-//
-//    }
 
     protected boolean parseNumInputs(){
 
@@ -749,23 +679,25 @@ public class Processor implements ActionListener {
 
         boolean validInputs = parseNumInputs();
 
-        int r = filechooser.showOpenDialog(topPanel);
+        if (validInputs) {
+            int r = filechooser.showOpenDialog(topPanel);
 
-        if ( r == JFileChooser.APPROVE_OPTION ){
+            if ( r == JFileChooser.APPROVE_OPTION ){
 
-            File[] currentFiles = filechooser.getSelectedFiles();
+                File[] currentFiles = filechooser.getSelectedFiles();
 
-            File crtFile = currentFiles[0];
+                File crtFile = currentFiles[0];
 
-            // the files are sorted by their filenames by default
+                // the files are sorted by their filenames by default
 
-            // validation function, otherwise throws shit
-            boolean validFirstLines = validateFileStructureFromFirstLines(crtFile);
+                // validation function, otherwise throws shit
+                boolean validFirstLines = validateFileStructureFromFirstLines(crtFile);
 
-            if (validFirstLines) {
-                processFiles(crtFile);
+                if (validFirstLines) {
+                    processFiles(crtFile);
+                }
+
             }
-
         }
 
     }
