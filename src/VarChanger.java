@@ -1,5 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -19,9 +21,12 @@ public class VarChanger extends JPanel{
 
     private int currentValIndex;
 
+    private JButton leftBtn;
+    private JButton rightBtn;
+
     private String varName;
     private JLabel valLabel;
-
+    private JLabel nameLabel;
 
     private JPanel theButtonContainer;
     private JButton theButton;
@@ -76,8 +81,14 @@ public class VarChanger extends JPanel{
 
         hideBtn.setAction(new HideBtnAction(this, browser));
         hideBtn.setText("Hide");
+        nameLabel = new JLabel("");
 
-        JLabel nameLabel = new JLabel(varName);
+        if (runNumber){
+            setLabelWithAllSuffix();
+        }
+        else {
+            setNameLabelWithoutSuffix();
+        }
 
         JPanel allRunsBtnContainer = new JPanel();
          if ( runNumber )
@@ -87,7 +98,7 @@ public class VarChanger extends JPanel{
             FlowLayout allRunsLayout = new FlowLayout();
             allRunsBtnContainer.setLayout(allRunsLayout);
 
-            ImageIcon resetIcon = new ImageIcon("C:\\Work\\Code\\SweepVisualizer\\src\\reset.png");
+            ImageIcon resetIcon = new ImageIcon("/Users/mateia/Work/sweepVis/SweepVisualizer/src/reset.png");
             //System.out.println("initial icon dimensions: " + resetIcon.getIconWidth() + "x" + resetIcon.getIconHeight());
 
             ImageIcon scaledIcon = scaleImage(resetIcon, 32, 32);
@@ -111,7 +122,7 @@ public class VarChanger extends JPanel{
         JPanel leftBtnContainer = new JPanel();
         leftBtnContainer.setLayout(new GridBagLayout());
 
-        JButton leftBtn = new JButton();
+        leftBtn = new JButton();
         leftBtn.setMinimumSize(new Dimension(50,40));
         leftBtn.setPreferredSize(new Dimension(50,40));
         BtnAction leftBtnAction;
@@ -129,7 +140,7 @@ public class VarChanger extends JPanel{
         JPanel rightBtnContainer = new JPanel();
         rightBtnContainer.setLayout(new GridBagLayout());
 
-        JButton rightBtn = new JButton();
+        rightBtn = new JButton();
         rightBtn.setMinimumSize(new Dimension(50,40));
         rightBtn.setPreferredSize(new Dimension(50,40));
         BtnAction rightBtnAction;
@@ -138,13 +149,13 @@ public class VarChanger extends JPanel{
         else
             rightBtnAction = new BtnAction(this, browser, BtnAction.RIGHT);
         rightBtn.setAction(rightBtnAction);
-        // rightBtn.setText(">");
+        rightBtn.setText(">");
 
-        ImageIcon resetIcon = new ImageIcon("C:\\Work\\Code\\SweepVisualizer\\src\\reset.png");
+        //ImageIcon resetIcon = new ImageIcon("C:\\Work\\Code\\SweepVisualizer\\src\\reset.png");
         //System.out.println("initial icon dimensions: " + resetIcon.getIconWidth() + "x" + resetIcon.getIconHeight());
 
-        ImageIcon scaledIcon = scaleImage(resetIcon, 32, 32);
-        rightBtn.setIcon(scaledIcon);
+        //ImageIcon scaledIcon = scaleImage(resetIcon, 32, 32);
+        //rightBtn.setIcon(scaledIcon);
 
         rightBtnContainer.add(rightBtn);
 
@@ -156,10 +167,38 @@ public class VarChanger extends JPanel{
         add(valLabel);
         add(rightBtnContainer);
 
-        setBorder(BorderFactory.createMatteBorder(
-                2, 0, 2, 0, Color.black));
+        //setBorder(BorderFactory.createMatteBorder(
+        //        2, 2, 2, 2, Color.black));
+
+        setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(3, 3, 3, 3),  new EtchedBorder()));
 
 
+    }
+
+    protected void simulateLeftBtnClick(){
+        leftBtn.doClick();
+    }
+
+    protected void simulateRightBtnClick() {
+        rightBtn.doClick();
+    }
+
+    protected void setLabelWithAllSuffix(){
+        nameLabel.setText(varName + " (all)");
+    }
+
+    protected void setNameLabelWithoutSuffix(){
+        nameLabel.setText(varName);
+    }
+
+    protected void setTextFaded(){
+        nameLabel.setForeground(Color.lightGray);
+        valLabel.setForeground(Color.lightGray);
+    }
+
+    protected void setTextNormal(){
+        nameLabel.setForeground(Color.black);
+        valLabel.setForeground(Color.black);
     }
 
     protected Browser getBrowser(){

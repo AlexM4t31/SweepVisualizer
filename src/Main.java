@@ -21,9 +21,9 @@ public class Main {
         // Create and add top panel, without button
         JPanel topPanel = new JPanel();
 
-        topPanel.setMinimumSize(new Dimension(620, 90));
-        topPanel.setPreferredSize(new Dimension(620, 90));
-        topPanel.setMaximumSize(new Dimension(620,90));
+        topPanel.setMinimumSize(new Dimension(620, 100));
+        topPanel.setPreferredSize(new Dimension(620, 100));
+        topPanel.setMaximumSize(new Dimension(620,100));
 
         GridBagConstraints cOne = new GridBagConstraints();
         cOne.gridx = 0;
@@ -142,6 +142,8 @@ public class Main {
         scrollPane.setPreferredSize(new Dimension(640, 660));
         scrollPane.setMaximumSize((new Dimension(640,660)));
 
+        //resultsPanel.setBackground(Color.red);
+
 //        resultsPanel.setMinimumSize(new Dimension(260,660));
 //        resultsPanel.setPreferredSize(new Dimension(260,660));
 //        resultsPanel.setMaximumSize(new Dimension(260,660));
@@ -152,6 +154,7 @@ public class Main {
         JPanel btmRightPanel = new JPanel();
         FlowLayout btmRightLayout = new FlowLayout();
         btmRightLayout.setAlignment(FlowLayout.RIGHT);
+//        btmRightPanel.setLayout(new GridBagLayout());
         btmRightPanel.setLayout(btmRightLayout);
 
         btmRightPanel.setMinimumSize(new Dimension(950, 660));
@@ -166,17 +169,31 @@ public class Main {
 
         //imagePanel.setBackground(Color.RED);
 
-        btmRightPanel.add(imagePanel);
+        GridBagConstraints imgGBConstraints = new GridBagConstraints();
+        //imgGBConstraints.fill = GridBagConstraints.VERTICAL;
+        imgGBConstraints.gridx = 0;
+        imgGBConstraints.gridy = 0;
+
+        btmRightPanel.add(imagePanel);//,imgGBConstraints);
 
         JPanel valuePanel = new JPanel();
         valuePanel.setLayout(new BoxLayout( valuePanel, BoxLayout.Y_AXIS));
+//        valuePanel.setMinimumSize(new Dimension(1000,1000));
+//        valuePanel.setPreferredSize(new Dimension(1000,1000));
+        valuePanel.setMinimumSize(new Dimension(550,200));
+        valuePanel.setMaximumSize(new Dimension(1000,1000));
 
         JScrollPane valueScrollPane = new JScrollPane(valuePanel);
-        valueScrollPane.setMinimumSize(new Dimension(550, 200));
-        valueScrollPane.setPreferredSize(new Dimension(550, 200));
-        valueScrollPane.setMaximumSize(new Dimension(550, 200));
+        valueScrollPane.setMinimumSize(new Dimension(550, 100));
+        valueScrollPane.setPreferredSize(new Dimension(550, 100));
+        valueScrollPane.setMaximumSize(new Dimension(550, 100));
 
-        btmRightPanel.add(valueScrollPane);
+        GridBagConstraints vspGBConstraints = new GridBagConstraints();
+        //vspGBConstraints.fill = GridBagConstraints.VERTICAL;
+        vspGBConstraints.gridx = 0;
+        vspGBConstraints.gridy = 1;
+
+        btmRightPanel.add(valueScrollPane);//,vspGBConstraints);
 
         bottomPanel.add(btmRightPanel, bottomPanelConstraintsTwo);
 

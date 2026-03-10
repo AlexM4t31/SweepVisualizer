@@ -16,6 +16,8 @@ public class AllRunsBtnAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
 
         varChanger.runNumberChangerResetValueList();
+        varChanger.setLabelWithAllSuffix();
+        browser.setVarChangersTextFaded();
         browser.updateValues();
         browser.updateImage();
     }

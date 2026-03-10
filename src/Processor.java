@@ -14,6 +14,8 @@ public class Processor implements ActionListener {
     private JButton button;
     private JFileChooser filechooser;
 
+    private Browser browser;
+
     private File currentFile;
 
     private JPanel varsPanel, topPanel, valuePanel;
@@ -596,7 +598,12 @@ public class Processor implements ActionListener {
 
                 //displayStructuredResults(structuredResults, varNames);
 
-                Browser browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
+                if (browser != null)
+                {
+                    browser.resetBrowsing();
+                }
+
+                browser = new Browser(varsPanel, valuePanel, imagePanel, valNames, varNames, structuredResults, results, file);
 
                 browser.setupBrowsing();
 

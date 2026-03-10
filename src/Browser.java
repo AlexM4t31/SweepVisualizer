@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.io.File;
 
@@ -34,6 +35,21 @@ public class Browser extends JPanel {
         this.varPanel = varPanel;
     }
 
+    public void resetBrowsing(){
+        varPanel.removeAll();
+        valuePanel.removeAll();
+
+        this.varNames = null;
+        this.valueNames = null;
+        this.valuePanel = null;
+        this.structuredResults = null;
+        this.results = null;
+        this.varChangers = null;
+        this.currentFile = null;
+        this.imagePanel = null;
+        this.varPanel = null;
+    }
+
     public void setupBrowsing(){
 
         //JSeparator jSeparator = new JSeparator();
@@ -44,23 +60,54 @@ public class Browser extends JPanel {
         //varPanel.add(new JSeparator());
 
         for ( int i=1; i<varNames.size(); i++ ){
-
-            // jSeparator= new JSeparator();
             VarChanger v = new VarChanger(false, this, imagePanel, structuredResults.get(i).keySet(), varNames.get(i));
             varPanel.add( v );
             varChangers.add( v );
-            //varPanel.add(jSeparator);
         }
 
         hiddenVarsPanel = new JPanel();
 
         BoxLayout boxLayout = new BoxLayout(hiddenVarsPanel, BoxLayout.Y_AXIS);
+
         hiddenVarsPanel.setLayout(boxLayout);
 
+        hiddenVarsPanel.setMaximumSize(new Dimension(225, 1000));
+
+        hiddenVarsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        //JPanel hiddenVarsLabelPanel = new JPanel();
+        //hiddenVarsLabelPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JLabel hiddenVarsLabel = new JLabel("Hidden variables: ");
-        hiddenVarsPanel.add(hiddenVarsLabel);
+
+        hiddenVarsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        varPanel.add(hiddenVarsLabel);
+
+        setVarChangersTextFaded();
+
+        JPanel hiddenVarsLabelPanel = new JPanel();
+
+        //hiddenVarsLabelPanel.setMaximumSize(new Dimension(225, 20));
+//        hiddenVarsLabelPanel.setMinimumSize(new Dimension(2, 20));
+//
+//        hiddenVarsLabelPanel.setLayout(new BoxLayout(hiddenVarsLabelPanel, BoxLayout.Y_AXIS));
+//
+//        hiddenVarsLabelPanel.add(hiddenVarsLabel);
+//
+//        hiddenVarsLabelPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//
+//        hiddenVarsLabelPanel.setBackground(Color.blue);
+
+        //Border blackline = BorderFactory.createLineBorder(Color.black);
+
+//        hiddenVarsLabelPanel.setBorder(blackline);
+//
+//        hiddenVarsPanel.add(hiddenVarsLabelPanel);
 
         varPanel.add(hiddenVarsPanel);
+
+        //hiddenVarsPanel.setBackground(Color.red);
 
         updateImage();
         updateValues();
@@ -81,6 +128,8 @@ public class Browser extends JPanel {
 
     public boolean updateRunIds() {
         Set<Result> finalSet = new HashSet<Result>(results.values());
+
+        int initCount = finalSet.size();
 
         for ( int i=1; i<structuredResults.size(); i++)
         {
@@ -110,12 +159,52 @@ public class Browser extends JPanel {
         runNumberChanger.setValueList( finalList );
 
         if ( finalList.size() > 0 ) {
+
+            if (finalList.size() == initCount){
+                runNumberChanger.setLabelWithAllSuffix();
+                setVarChangersTextFaded();
+            } else {
+                runNumberChanger.setNameLabelWithoutSuffix();
+                setVarChangersTextNormal();
+            }
+
             runNumberChanger.setCurrentValIndex(0);
             return true;
         }
         else {
             runNumberChanger.setCurrentValToNothing();
             return false;
+        }
+    }
+
+    public String[] getValuePanelValueList() {
+        Component[] valuePanelComponents = valuePanel.getComponents();
+
+        String[] valuePanelStrings = new String[valuePanelComponents.length];
+
+        for (int i=0; i<valuePanelComponents.length;i++){
+
+            JLabel tmpLabel = (JLabel) valuePanelComponents[i];
+
+            valuePanelStrings[i] = tmpLabel.getText();
+        }
+
+        return valuePanelStrings;
+    }
+
+    public void setVarChangersTextFaded(){
+        for(int i=1; i< varChangers.size();i++){
+            VarChanger tmpvc = varChangers.get(i);
+
+            tmpvc.setTextFaded();
+        }
+    }
+
+    public void setVarChangersTextNormal() {
+        for(int i=0; i< varChangers.size();i++){
+            VarChanger tmpvc = varChangers.get(i);
+
+            tmpvc.setTextNormal();
         }
     }
 
@@ -208,20 +297,43 @@ public class Browser extends JPanel {
     public void addHiddenVar(VarChanger varChanger){
 
         JPanel container = new JPanel();
-        FlowLayout flowLayout = new FlowLayout();
-        flowLayout.setAlignment(FlowLayout.LEFT);
-        container.setLayout(flowLayout);
+        //FlowLayout flowLayout = new FlowLayout();
+        //flowLayout.setAlignment(FlowLayout.LEFT);
+        container.setLayout(new GridLayout(1,2));
 
         container.setMaximumSize(new Dimension(200,30));
 
-        container.add(new JLabel(varChanger.getVarName()));
+        // container.setBackground(Color.red);
+
+        JPanel leftContainer = new JPanel();
+
+        JLabel tmpJlabel = new JLabel(varChanger.getVarName());
+
+        // leftContainer.setBackground(Color.orange);
+
+        leftContainer.add(tmpJlabel);
+
+        leftContainer.setLayout(new BoxLayout(leftContainer, BoxLayout.Y_AXIS));
+
+        JPanel rightContainer = new JPanel();
+
+        rightContainer.setLayout(new BoxLayout(rightContainer, BoxLayout.Y_AXIS));
+
+        // rightContainer.setBackground(Color.CYAN);
 
         ShowBtnAction showBtnAction = new ShowBtnAction(varChanger, container);
 
         JButton btn = new JButton();
         btn.setAction(showBtnAction);
 
-        container.add(btn);
+        btn.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        rightContainer.add(btn);
+
+        //container.add(btn);
+
+        container.add(leftContainer);//, leftGBConstraints);
+        container.add(rightContainer);//, rightGBConstraints);
 
         hiddenVarsPanel.add(container);
 
